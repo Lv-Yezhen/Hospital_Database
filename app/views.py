@@ -69,13 +69,13 @@ def patient():
 def check_doctor():
     """check doctor"""
     table='doctor'
-    attribute = '*'
+    attribute = ' '
     sql = SQL_Server()
     if not sql.tableDetect(table):
         # exceptions.BadRequestKeyError here
         print("error: table doctor not exist")
         return render_template('patient.html')
-    results = sql.selectFromTable(table, attribute)
+    results = sql.selectFromTable(table, ' ', ' ')
     attributeList = sql.getAttributeListForSelectShow(table, attribute)
     if len(results) != 0:
         col = len(results[0])
@@ -86,8 +86,7 @@ def check_doctor():
 @app.route('/patient_insert', methods=['POST'])
 def patient_insert():
     """patient insert"""
-    table='__'
-    attribute = '*'
+    table='doctor_visits'
 
     patient_id = request.form['patient_id']
     patient_name = request.form['patient_name']
@@ -99,9 +98,9 @@ def patient_insert():
     sql = SQL_Server()
 
     insertSQL1 = "('{}', '{}', '{}')".format(patient_id, patient_name, patient_gender)
-    registration_id=sql.generate_id('registration','registration_id')
-    doctor_visits_id=sql.generate_id('doctor_visits','doctor_visits_id')
-    insertSQL2 = "('{}', '{}','{}', '{}')".format(doctor_visits_id, doctor_id,patient_id, patient_condition)
+    registration_id = sql.generate_id('registration', 'registration_id')
+    doctor_visits_id = sql.generate_id('doctor_visits', 'doctor_visits_id')
+    insertSQL2 = "('{}', '{}','{}', '{}')".format(doctor_visits_id, doctor_id, patient_id, patient_condition)
     insertSQL3 = "('{}','{}')".format(registration_id, doctor_visits_id)
 
 
@@ -109,14 +108,19 @@ def patient_insert():
     SF1 = sql.insertIntoTable('registered_user', insertSQL1)
     SF2 = sql.insertIntoTable('doctor_visits', insertSQL2)
     SF3 = sql.insertIntoTable('registration', insertSQL3)
-  
+    print("sql1:",  insertSQL1)
+    print("sql2:",  insertSQL2)
+    print("sql3:",  insertSQL3)
+
 
     if SF2 == 'Succeeded' and SF3 == 'Succeeded':
         SF = 'Succeeded'
     else:
         SF = 'Failed'
-    
-    results = sql.selectFromTable('doctor_visits', '*')
+
+    attribute = ' '
+    selected_option = ' '
+    results = sql.selectFromTable(table, selected_option, attribute) or []
     attributeList = sql.getAttributeListForSelectShow('doctor_visits', '*')
     if len(results) != 0:
         col = len(results[0])
@@ -155,8 +159,14 @@ def selectResult():
     """show select option result"""
     global table
     attribute = request.form['attribute']
+    selected_option = request.form['selected_option']
+
     sql = SQL_Server()
-    results = sql.selectFromTable(table, attribute)
+    print("table: ", table)
+    print("attribute: ", attribute)
+    print("selected_option: ", selected_option)
+    results = sql.selectFromTable(table, selected_option, attribute) or []
+    print("result: ", results)
     attributeList = sql.getAttributeListForSelectShow(table, attribute)
     if len(results) != 0:
         col = len(results[0])
@@ -174,8 +184,9 @@ def insertPanel():
     if not sql.tableDetect(table):
         # exceptions.BadRequestKeyError here
         return redirect('/developer')
-    attribute = '*'
-    results = sql.selectFromTable(table, attribute)
+    attribute = ' '
+    selected_option = ' '
+    results = sql.selectFromTable(table, selected_option, attribute)
     attributeList = sql.getAttributeListOfTable(table)
     if len(results) != 0:
         col = len(results[0])
@@ -187,12 +198,14 @@ def insertPanel():
 def insertResult():
     """show result after insertion"""
     global table
-    attribute = '*'
     sql = SQL_Server()
     insertSQL = request.form['insertSQL']
+    print("insert: ", insertSQL)
     # do insertion
     SF = sql.insertIntoTable(table, insertSQL)
-    results = sql.selectFromTable(table, attribute)
+    attribute = ' '
+    selected_option = ' '
+    results = sql.selectFromTable(table, selected_option, attribute)
     attributeList = sql.getAttributeListForSelectShow(table, attribute)
     if len(results) != 0:
         col = len(results[0])
@@ -210,8 +223,9 @@ def deletePanel():
     if not sql.tableDetect(table):
         # exceptions.BadRequestKeyError here
         return redirect('/developer')
-    attribute = '*'
-    results = sql.selectFromTable(table, attribute)
+    attribute = ' '
+    selected_option = ' '
+    results = sql.selectFromTable(table, selected_option, attribute)
     attributeList = sql.getAttributeListOfTable(table)
     if len(results) != 0:
         col = len(results[0])
@@ -223,12 +237,13 @@ def deletePanel():
 def deleteResult():
     """show result after deletion"""
     global table
-    attribute = '*'
     sql = SQL_Server()
     deleteSQL = request.form['deleteSQL']
     # do deletion
     SF = sql.deleteFromUserTable(table, deleteSQL)
-    results = sql.selectFromTable(table, attribute)
+    attribute = ' '
+    selected_option = ' '
+    results = sql.selectFromTable(table, selected_option, attribute)
     attributeList = sql.getAttributeListForSelectShow(table, attribute)
     if len(results) != 0:
         col = len(results[0])
