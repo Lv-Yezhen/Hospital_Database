@@ -75,7 +75,7 @@ class SQL_Server():
 			return self.getAttributeListOfTable(table)
 		return [attribute]
 
-	def selectFromTable(self, table, attribute):
+		def selectFromTable(self, table, selected_option, attribute):
 		# update table and attribute
 		self.getTAList()
 
@@ -84,9 +84,22 @@ class SQL_Server():
 		cursor = conn.cursor()
 		try:
 			if table == 'MAKE' or table == 'ASSEMBLE':
-				cursor.execute('SELECT ' + attribute + ' FROM ' + table + ' order by date desc')
+				if selected_option != ' ' and attribute != ' ':
+					str = 'SELECT ' + '*' + ' FROM ' + table + ' Where ' + selected_option + '=' + '\'' + attribute + '\''
+				elif selected_option == ' ' and attribute != ' ':
+					str = 'SELECT ' + selected_option + ' FROM ' + table
+				else:
+					str = 'SELECT ' + '*' + ' FROM ' + table
+				cursor.execute(str)
 			else:
-				cursor.execute('SELECT ' + attribute + ' FROM ' + table)
+				if selected_option != ' ' and attribute != ' ':
+					str = 'SELECT ' + '*' + ' FROM ' + table + ' Where ' + selected_option + '=' + '\'' + attribute + '\''
+				elif selected_option == ' ' and attribute != ' ':
+					str = 'SELECT ' + selected_option + ' FROM ' + table
+				else:
+					str = 'SELECT ' + '*' + ' FROM ' + table
+				print("str=",str)
+				cursor.execute(str)
 			results = cursor.fetchall()
 			return results
 		except Exception as e:
@@ -165,7 +178,7 @@ class SQL_Server():
 	def generate_id(self, table, attribute):
 		while True:
 			id = str(random.randint(1000, 9999))  # Generate a random number between 1000 and 9999
-			results = self.selectFromTable(table, attribute)
+			results = self.selectFromTable(table, attribute, ' ')
 			if id not in [result[0] for result in results]:
 				break
 		return id
