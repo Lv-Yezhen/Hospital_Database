@@ -75,7 +75,7 @@ class SQL_Server():
 			return self.getAttributeListOfTable(table)
 		return [attribute]
 
-		def selectFromTable(self, table, selected_option, attribute):
+	def selectFromTable(self, table, selected_option, attribute):
 		# update table and attribute
 		self.getTAList()
 
